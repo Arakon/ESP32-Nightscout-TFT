@@ -1,5 +1,5 @@
 # ESP32-Nightscout-TFT
-![image](https://github.com/user-attachments/assets/0bb95f69-b46d-4360-be93-3be00d679c90)
+![image](https://github.com/user-attachments/assets/3c873dd6-202d-4296-86c1-1da339f6a62e)
 
 
 ESP32-C3 based low cost desktop display for Nightscout Glucose
