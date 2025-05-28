@@ -62,14 +62,16 @@ int sec_c;
 
 // These determine when the color of the glucose value changes, edit if you like.
 int HighBG = 180;
-int LowBG = 80;
-int CritBG = 60;
+int LowBG = 90;
+int CritBG = 70;
 
 // -------------------------------------
 // -------   Other Config   ------
 // -------------------------------------
 
 const int PIN_LED = 8;  // if not using ESP32-C3, edit to match the onboard LED pin
+const int backlight_pin = 0;
+int backlight = 64;
 
 #define JSON_CONFIG_FILE "/sample_config.json"
 
@@ -123,6 +125,7 @@ void serialPrintParams() {
   Serial.println("\tlocal_time_zone : " + String(local_time_zone));
   Serial.println("\tgmtOffset_sec : " + String(gmtOffset_sec));
   Serial.println("\tdaylightOffset_sec : " + String(daylightOffset_sec));
+  Serial.println("\tbacklight : " + String(backlight));
 }
 
 void saveConfigFile() {
@@ -136,7 +139,10 @@ void saveConfigFile() {
   json["local_time_zone"] = local_time_zone;
   json["gmtOffset_sec"] = gmtOffset_sec;
   json["daylightOffset_sec"] = daylightOffset_sec;
-
+  json["backlight"] = backlight;
+  json["HighBG"] = HighBG;
+  json["LowBG"] = LowBG;
+  json["CritBG"] = CritBG;
 
   File configFile = SPIFFS.open(JSON_CONFIG_FILE, "w");
   if (!configFile) {
@@ -183,7 +189,10 @@ bool loadConfigFile() {
           strcpy(local_time_zone, json["local_time_zone"]);
           gmtOffset_sec = json["gmtOffset_sec"];
           daylightOffset_sec = json["daylightOffset_sec"];
-
+          backlight = json["backlight"];
+          HighBG = json["HighBG"];
+          LowBG = json["LowBG"];
+          CritBG = json["CritBG"];
 
           Serial.println("\nThe loaded values are: ");
           serialPrintParams();
@@ -336,13 +345,14 @@ void setup() {
   Serial.println("ESP start");
 
   pinMode(PIN_LED, OUTPUT);
+  pinMode(backlight_pin, OUTPUT);
 
   // Initialize display
   tft.init();
   tft.setRotation(1);
   tft.fillScreen(TFT_BLACK);
   //Print something during boot so you know it's doing something
-
+  analogWrite(backlight_pin, 128);
   tft.setTextColor(TFT_YELLOW, TFT_BLACK);  // Note: the new fonts do not draw the background colour
   tft.setCursor(10, 80);
   tft.println("Starting up... Wait 60 seconds.");  // Due to the way the updates are delayed, it can take up to 60 seconds to get glucose data
@@ -374,7 +384,7 @@ void setup() {
   //sets timeout until configuration portal gets turned off
   //useful to make it all retry or go to sleep
   //in seconds
-  wm.setTimeout(10 * 60);
+  wm.setTimeout(15 * 60);
 
   //wm.resetSettings(); // wipe settings
 
@@ -425,7 +435,20 @@ void setup() {
   char str_daylightOffset_sec[5];
   sprintf(str_daylightOffset_sec, "%d", daylightOffset_sec);
   WiFiManagerParameter custom_daylightOffset_sec("daylightOffset_sec", "daylightOffset sec", str_daylightOffset_sec, 5);
+  
+  char str_backlight[5];
+  sprintf(str_backlight, "%d", backlight);
+  WiFiManagerParameter custom_backlight("backlight", "Backlight 0-255", str_backlight, 5);
 
+  char str_highbg[5];
+  sprintf(str_highbg, "%d", HighBG);
+  WiFiManagerParameter custom_highbg("HighBG", "High BG Value", str_highbg, 5);
+  char str_lowbg[5];
+  sprintf(str_lowbg, "%d", LowBG);
+  WiFiManagerParameter custom_lowbg("LowBG", "Low BG Value", str_lowbg, 5);
+    char str_critbg[5];
+  sprintf(str_critbg, "%d", CritBG);
+  WiFiManagerParameter custom_critbg("CritBG", "Critical BG Value", str_critbg, 5);
 
   // add app parameters to web interface
   wm.addParameter(&custom_NS_API_URL);
@@ -435,6 +458,10 @@ void setup() {
   wm.addParameter(&custom_local_time_zone);
   wm.addParameter(&custom_gmtOffset_sec);
   wm.addParameter(&custom_daylightOffset_sec);
+  wm.addParameter(&custom_backlight);
+  wm.addParameter(&custom_highbg);
+  wm.addParameter(&custom_lowbg);
+  wm.addParameter(&custom_critbg);
 
 
   //--- End additional parameters
@@ -483,6 +510,10 @@ void setup() {
   strcpy(local_time_zone, custom_local_time_zone.getValue());
   gmtOffset_sec = atoi(custom_gmtOffset_sec.getValue());
   daylightOffset_sec = atoi(custom_daylightOffset_sec.getValue());
+  backlight = atoi(custom_backlight.getValue());
+  HighBG = atoi(custom_highbg.getValue());
+  LowBG = atoi(custom_lowbg.getValue());
+  CritBG = atoi(custom_critbg.getValue());
 
 
   Serial.println("\nThe values returned are: ");
@@ -492,6 +523,7 @@ void setup() {
   if (shouldSaveConfig) {
     saveConfigFile();
   }
+  analogWrite(backlight_pin, backlight);
 
   // offset in seconds between local time and UTC
   tzOffset = getTzOffset(local_time_zone);
@@ -646,6 +678,7 @@ void loop() {
             tft.pushImage(180, 116, 50, 50, Up);
           }
           if ((trend) == 3) {
+            tft.setSwapBytes(true);
             tft.pushImage(180, 116, 50, 50, FortyFiveUp);
           }
           if ((trend) == 4) {
