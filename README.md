@@ -16,7 +16,8 @@ Note that if your display has additional pins, i.e. a CS pin, you can just ignor
 ESP32-C3:
 https://www.aliexpress.com/item/1005006599448997.html
 
-![wiring-C3](https://github.com/user-attachments/assets/b0e42f97-5557-42ae-8414-6258b47b1f5d)
+![wiring-C3](https://github.com/user-attachments/assets/eaa8e22f-1cd9-4673-a234-814b33b1991a)
+
 
 **It's critical that you install/downgrade the ESP32 Board version to 2.0.14!**
 
