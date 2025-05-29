@@ -40,3 +40,5 @@ Once the device starts for the first time, connect your WiFi (cellphone or PC) t
 If you ever want to change any of the options, quickly **doubleclick** the Reset button on the ESP32 to force config mode. This will require you to connect to the Nightscout-TFT access point again with the password displayed on the screen.
 
 Some status info is available on the serial monitor via USB (9600 baud).
+
+Partially based on [Gluci-Clock](https://github.com/Frederic1000/gluci-clock/) and my own [Nightscout-TFT](https://github.com/Arakon/Nightscout-TFT).
