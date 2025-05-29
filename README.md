@@ -18,7 +18,12 @@ https://www.aliexpress.com/item/1005006599448997.html
 
 ![wiring-C3](https://github.com/user-attachments/assets/eaa8e22f-1cd9-4673-a234-814b33b1991a)
 
-**Required libraries to install: TFT_eSPI, ArduinoJSON, WiFiManger**
+Use Arduino IDE 2.3.5 to compile.
+
+**Required libraries to install: TFT_eSPI 2.4.43, ArduinoJSON 7.4.1, WiFiManger 2.0.17, ESP_DoubleResetDetector 1.3.2**
+
+Newer versions may work, but these are known working.
+
 
 **It's critical that you install/downgrade the ESP32 Board version to _2.0.14_!**
 
@@ -32,6 +37,7 @@ STL files are provided for both display types, use hotglue to position the ESP32
 If you need to get back in there for any reason, isopropyl alcohol will instantly release hotglue.
 
 Once the device starts for the first time, connect your WiFi (cellphone or PC) to the access point "Nightscout-TFT" that becomes available. Enter the password shown on the screen, then visit 192.168.4.1 in your webbrowser. You can set up your nightscout instance and your home wifi there. Once everything is connected, you should get a full display. If it hangs, try unplugging, waiting for a moment, and plugging it back in.
+There is some oddity with the DoubleResetDetector library that causes it to sometimes enter config mode when plugged in. Unplugging and plugging back in fixes this usually.
 
 **First** run the Setup tab, with your Nightscout data, High/Low/Critical values and background light strength.
 
